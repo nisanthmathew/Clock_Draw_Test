@@ -30,6 +30,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity
     String patientAddress = null;
     String patientPhone = null;
     String patientInfo = null;
+    Uri URI = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,10 +130,7 @@ public class MainActivity extends AppCompatActivity
             about.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(about);
         } else if (id == R.id.nav_share) {
-            Intent share = new Intent();
-            share.setClass(MainActivity.this, SendEmail.class);
-            share.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK );
-            startActivity(share);
+            sendEmail();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity
                         + "Patient Name: " + patientName +"\n"
                         + "Patient Address: " + patientAddress + "\n"
                         + "Phone: " + patientPhone + "\n"
-                        + "Comments: +" + patientInfo );
+                        + "Comments: " + patientInfo );
             out.flush();
             out.close();
         } catch (Exception e) {
@@ -183,5 +183,23 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+    public void sendEmail() {
+        try {
+            String email = " ";
+            String subject = " ";
+            String message = " ";
+            final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+            emailIntent.setType("plain/text");
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{email});
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, subject);
+            if (URI != null) {
+                emailIntent.putExtra(Intent.EXTRA_STREAM, URI);
+            }
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, message);
+            this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
 
+        } catch (Throwable t) {
+            Toast.makeText(this, "Request failed try again: " + t.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
 }

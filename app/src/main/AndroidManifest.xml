@@ -16,10 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SendEmail"
-            android:label="@string/title_activity_send_email"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
             android:name=".About"
             android:label="@string/title_activity_about_scrolling"
             android:theme="@style/AppTheme.NoActionBar" />
