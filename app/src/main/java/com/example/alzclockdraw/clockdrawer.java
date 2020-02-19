@@ -126,10 +126,18 @@ public class clockdrawer extends View {
         canvas.drawLine( (float) (width*0.7), (float) (height*0.3), (float) (width), (float) (height*0.3),mlayout);
 
         canvas.drawText("Histogram X axis",(float) (width*0.85), (float) (height*0.45), textpaint);
-        canvas.drawText("clock x-axis pixel number",(float) (width*0.79), (float) (height*0.75), textpaint2);
+        canvas.drawText("Horizontal pixel number",(float) (width*0.79), (float) (height*0.75), textpaint2);
+        canvas.save();
+        canvas.rotate(-90f, (float) (width*0.69), (float) (height*0.60));
+        canvas.drawText("pixel count",(float) (width*0.69), (float) (height*0.6), textpaint2);
+        canvas.restore();
 
         canvas.drawText("Histogram Y axis", (float) (width * 0.85), (float) (height * 0.05), textpaint);
-        canvas.drawText("clock y-axis pixel number",(float) (width*0.79), (float) (height*0.35), textpaint2);
+        canvas.drawText("Vertical pixel number",(float) (width*0.79), (float) (height*0.35), textpaint2);
+        canvas.save();
+        canvas.rotate(-90f, (float) (width*0.69), (float) (height*0.25));
+        canvas.drawText("pixel count",(float) (width*0.69), (float) (height*0.25), textpaint2);
+        canvas.restore();
 
         canvas.drawBitmap(mBitmap,mRectangle,mRectangle,mBitmapPaint);
         canvas.drawPath(mPath, mPaint);

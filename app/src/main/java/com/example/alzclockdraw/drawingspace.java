@@ -119,8 +119,8 @@ public class drawingspace extends AppCompatActivity {
 
                 int [] yaxis_limits = first_and_last_clockpixel_finder_yaxis(clockimage);
 
-                Xaxis_histogram(clockimage,xaxis_limits[0],xaxis_limits[1]);
-                Yaxis_histogram(clockimage,yaxis_limits[0],yaxis_limits[1]);
+                int[] xaxishistogram = Xaxis_histogram(clockimage,xaxis_limits[0],xaxis_limits[1]);
+                int[] yaxishistogram = Yaxis_histogram(clockimage,yaxis_limits[0],yaxis_limits[1]);
 
                 yaxisvalue_marker(saveimage,(int)(width*0.7),(int)(height*0.3)); //histogram y marking
                 yaxisvalue_marker(saveimage,(int)(width*0.7),(int)(height*0.7)); //histogram x marking
@@ -129,6 +129,11 @@ public class drawingspace extends AppCompatActivity {
                 xaxisvalue_marker(saveimage,(int)(width*0.7),(int)(height*0.72)); //histogram x marking
 
                 displaytime(saveimage,(int)(width*0.75),(int)(height*0.9));
+
+                //image analysis functions
+                clockshapeuniformity(saveimage, xaxis_limits, yaxis_limits);
+                clocknumberverticaldistributionchecker(saveimage, xaxishistogram);
+                clocknumberhorizontaldistributionchecker(saveimage, yaxishistogram);
 
                 for(int imagecolumn = 0; imagecolumn < width*0.2; imagecolumn++){ //removing the floating buttons
                     for(int imagerow= 0; imagerow < (height*0.2) ; imagerow++){
@@ -311,6 +316,101 @@ int[] first_and_last_clockpixel_finder_xaxis( Bitmap inputimage ){
         count = 0;
 
     }
+
+    void clockshapeuniformity(Canvas inputimage, int[] xaxispixelpositions, int[] yaxispixelpositions ){ //clock shape roundness checker
+        int horizontallength = xaxispixelpositions[1] - xaxispixelpositions[0];
+        int verticallength = yaxispixelpositions[1] - yaxispixelpositions[0];
+        Paint textpaint = new Paint();
+        textpaint.setColor(Color.BLUE);
+        textpaint.setTextSize(35);
+
+       if(abs(horizontallength-verticallength) > 50){
+
+           inputimage.drawText("Clock shape not uniform",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.85f, textpaint);
+
+       }
+       else{
+           inputimage.drawText("Clock shape is uniform",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.85f, textpaint);
+       }
+    }
+
+    void clocknumberverticaldistributionchecker(Canvas inputimage, int[] histogram){
+        Paint textpaint = new Paint();
+        textpaint.setColor(Color.BLUE);
+        textpaint.setTextSize(35);
+        int averageXaxis = 0;
+        for(int i=0; i<histogram.length; i++){
+            averageXaxis += histogram[i];
+        }
+        averageXaxis = (averageXaxis/histogram.length);
+        // dividing the clock vertically into 5 segments and look for peaks corrresponding to numbers in each window.
+        int peakcounter = 0;
+        int runningcounter = 0;
+        int segmentcounter = 1;
+        int segmentsize = (histogram.length)/7;
+        int segmentstartposition = 0;
+
+       while(segmentcounter<=5) {
+           for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
+               if (histogram[i] > averageXaxis) {
+                   runningcounter++;
+               }
+               if (runningcounter > 15) { // checking for 10 pixels to be greater than the average
+                   peakcounter++;
+                   runningcounter = 0;
+                   segmentstartposition += segmentsize;
+               }
+           }
+           segmentcounter++;
+       }
+
+        if(peakcounter-2 <= 8 && peakcounter-2 >=5){ //subtracting the pixel peaks from the clock edges
+           inputimage.drawText("Numbering in vertical direction is symmetric. Peaks detected: " + String.valueOf(peakcounter-2),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
+       }
+       else{
+           inputimage.drawText("Numbering in vertical direction is asymmetric. Peaks detected: " + String.valueOf(peakcounter-2),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
+       }
+    }
+
+
+    void clocknumberhorizontaldistributionchecker(Canvas inputimage, int[] histogram){
+        Paint textpaint = new Paint();
+        textpaint.setColor(Color.BLUE);
+        textpaint.setTextSize(35);
+        int averageYaxis = 0;
+        for(int i=0; i<histogram.length; i++){
+            averageYaxis += histogram[i];
+        }
+        averageYaxis = (averageYaxis/histogram.length);
+        // dividing the clock vertically into 5 segments and look for peaks corrresponding to numbers in each window.
+        int peakcounter = 0;
+        int runningcounter = 0;
+        int segmentcounter = 1;
+        int segmentsize = (histogram.length)/7;
+        int segmentstartposition = 0;
+
+        while(segmentcounter<=5) {
+            for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
+                if (histogram[i] > averageYaxis) {
+                    runningcounter++;
+                }
+                if (runningcounter > 15) {
+                    peakcounter++;
+                    runningcounter = 0;
+                    segmentstartposition += segmentsize;
+                }
+            }
+            segmentcounter++;
+        }
+
+        if(peakcounter-2 <= 8 && peakcounter-2 >=5){ //subtracting the pixel peaks from the clock edges
+            inputimage.drawText("Numbering in horizontal direction is symmetric. Peaks detected:  " + String.valueOf(peakcounter-2),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
+        }
+        else{
+            inputimage.drawText("Numbering in horizontal direction is asymmetric. Peaks detected:  " + String.valueOf(peakcounter-2),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
+        }
+    }
+
 
 
 }
