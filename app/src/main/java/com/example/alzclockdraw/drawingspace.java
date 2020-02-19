@@ -43,11 +43,17 @@ import static java.lang.Math.abs;
 
 public class drawingspace extends AppCompatActivity {
     String imagename; // variable to store patient id
+    String patienttime; // variable to store patient id
+
+
     Bitmap clockimage;
     Canvas saveimage;
     static int count = 0;
     static boolean allowdrawing = false;
     static Timer drawtimer;
+    RelativeLayout viewGroup;
+    View drawing_area;
+    TextView patientmessage;
 
 
     @Override
@@ -56,13 +62,20 @@ public class drawingspace extends AppCompatActivity {
         Bundle b =getIntent().getExtras(); //extracting the patient id
         if(b != null){
             imagename = b.getString("patientid");
+            patienttime = b.getString("patienttime");
         }
         setContentView(R.layout.activity_drawingspace);
-        final RelativeLayout viewGroup = findViewById(R.id.my_viewgroup);
-        final View drawing_area = new clockdrawer(this);
+        ((TextView) findViewById(R.id.messagetopatient)).setText("Please Draw the time " + "'" + patienttime + "'" + " on an analog clock");
+       /* patientmessage = findViewById(R.id.messagetopatient);
+        patientmessage.setText("Please Draw the time on an analog clock." );*/
         // Add a new drawing area to existing layout
+
         if(allowdrawing){
-        viewGroup.addView(drawing_area);}
+            findViewById(R.id.messagetopatient).setVisibility(View.INVISIBLE);
+            viewGroup = findViewById(R.id.my_viewgroup);
+            drawing_area = new clockdrawer(this);
+            viewGroup.addView(drawing_area);
+        }
 
         /********************Create new drawing space*****************************/
         final FloatingActionButton addimage = findViewById(R.id.newimage);

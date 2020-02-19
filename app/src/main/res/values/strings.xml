@@ -120,4 +120,5 @@
     <string name="clock_about">The clock drawing test is widely used as a screening test for dementia. Neurologists have used clock-drawing and time telling tests extensively. There are two general clock drawing test scoring approaches, including qualitative and quantitative, and varied scoring systems that emphasize different facets of the clock drawing process.</string>
     <string name="title_activity_send_email">SendEmail</string>
     <string name="email_id">subject</string>
+    <string name="timetodraw">Time to Draw</string>
 </resources>

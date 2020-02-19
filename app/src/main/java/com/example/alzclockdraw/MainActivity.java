@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     String patientName = null;
     String patientAddress = null;
     String patientPhone = null;
+    String patientTime = null;
     String patientInfo = null;
     Uri URI = null;
 
@@ -57,12 +58,13 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 extractpatientdetails();
-                if (!patientID.isEmpty()&& !patientName.isEmpty()) {
+                if (!patientID.isEmpty()&& !patientName.isEmpty() && !patientTime.isEmpty() ) {
                     savepatientdetails();
                     Intent j = new Intent();
                     j.setClass(MainActivity.this, drawingspace.class);
                     j.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     j.putExtra("patientid",patientID); // sending patient id to the next activity
+                    j.putExtra("patienttime",patientTime); // sending patient time to the next activity
                     startActivity(j);
                 }
                 else {
@@ -72,6 +74,25 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
+
+
+        FloatingActionButton savedata = findViewById(R.id.save); //instantiate drawing space
+        savedata.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                extractpatientdetails();
+                if (!patientID.isEmpty()&& !patientName.isEmpty() && !patientTime.isEmpty() ) {
+                    savepatientdetails();
+                }
+                else {
+                    Snackbar.make(view, "Fill in the details before proceeding", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
+                }
+            }
+        });
+
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -147,6 +168,8 @@ public class MainActivity extends AppCompatActivity
         patientAddress = patientaddress.getText().toString();
         EditText patientphone = (EditText) findViewById(R.id.patphone);
         patientPhone = patientphone.getText().toString();
+        EditText timetodraw = (EditText) findViewById(R.id.timefordrawing);
+        patientTime = timetodraw.getText().toString();
         EditText patientinfo = (EditText) findViewById(R.id.comments);
         patientInfo = patientinfo.getText().toString();
     }
@@ -175,6 +198,7 @@ public class MainActivity extends AppCompatActivity
                         + "Patient Name: " + patientName +"\n"
                         + "Patient Address: " + patientAddress + "\n"
                         + "Phone: " + patientPhone + "\n"
+                        + "Time Drawn: " + patientTime + "\n"
                         + "Comments: " + patientInfo );
             out.flush();
             out.close();

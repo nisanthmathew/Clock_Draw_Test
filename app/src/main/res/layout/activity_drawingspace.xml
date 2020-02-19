@@ -8,6 +8,25 @@
     android:layout_height="match_parent">
 
 
+    <TextView
+        android:id="@+id/messagetopatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="273dp"
+        android:layout_marginTop="254dp"
+        android:layout_marginEnd="256dp"
+        android:layout_marginBottom="315dp"
+        android:fontFamily="sans-serif-condensed-light"
+        android:text="@string/timetodraw"
+        android:textAlignment="center"
+        android:textColor="@color/colourtop"
+        android:textSize="24sp"
+        android:typeface="sans" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -34,6 +53,6 @@
         android:backgroundTint="@color/colourbutton"
         android:clickable="true"
         app:backgroundTint="@color/colourbutton"
-        app:srcCompat="@drawable/ic_add" />
+        app:srcCompat="@drawable/ic_marker" />
 
 </RelativeLayout>
