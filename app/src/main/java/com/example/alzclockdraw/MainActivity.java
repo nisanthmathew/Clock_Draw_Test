@@ -2,36 +2,24 @@
 
 package com.example.alzclockdraw;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import android.os.Environment;
-import android.provider.ContactsContract;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
-
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-
 import android.view.MenuItem;
-
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
-
 import androidx.drawerlayout.widget.DrawerLayout;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.view.Menu;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
@@ -134,7 +122,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-        /*******************************Side pane activity***********************/
+    /*******************************Side pane activity***********************/
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -195,11 +183,11 @@ public class MainActivity extends AppCompatActivity
         try {
             FileWriter out = new FileWriter(file);
             out.append("Patient ID: " + patientID + "\n"
-                        + "Patient Name: " + patientName +"\n"
-                        + "Patient Address: " + patientAddress + "\n"
-                        + "Phone: " + patientPhone + "\n"
-                        + "Time Drawn: " + patientTime + "\n"
-                        + "Comments: " + patientInfo );
+                    + "Patient Name: " + patientName +"\n"
+                    + "Patient Address: " + patientAddress + "\n"
+                    + "Phone: " + patientPhone + "\n"
+                    + "Time Drawn: " + patientTime + "\n"
+                    + "Comments: " + patientInfo );
             out.flush();
             out.close();
         } catch (Exception e) {

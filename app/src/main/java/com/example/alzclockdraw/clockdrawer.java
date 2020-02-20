@@ -3,17 +3,14 @@
 
 package com.example.alzclockdraw;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 
 public class clockdrawer extends View {
     private static final float MINP = 0.25f;
@@ -126,14 +123,14 @@ public class clockdrawer extends View {
         canvas.drawLine( (float) (width*0.7), (float) (height*0.3), (float) (width), (float) (height*0.3),mlayout);
 
         canvas.drawText("Histogram X axis",(float) (width*0.85), (float) (height*0.45), textpaint);
-        canvas.drawText("Horizontal pixel number",(float) (width*0.79), (float) (height*0.75), textpaint2);
+        canvas.drawText("Column number",(float) (width*0.79), (float) (height*0.75), textpaint2);
         canvas.save();
         canvas.rotate(-90f, (float) (width*0.69), (float) (height*0.60));
         canvas.drawText("pixel count",(float) (width*0.69), (float) (height*0.6), textpaint2);
         canvas.restore();
 
         canvas.drawText("Histogram Y axis", (float) (width * 0.85), (float) (height * 0.05), textpaint);
-        canvas.drawText("Vertical pixel number",(float) (width*0.79), (float) (height*0.35), textpaint2);
+        canvas.drawText("row number",(float) (width*0.79), (float) (height*0.35), textpaint2);
         canvas.save();
         canvas.rotate(-90f, (float) (width*0.69), (float) (height*0.25));
         canvas.drawText("pixel count",(float) (width*0.69), (float) (height*0.25), textpaint2);
