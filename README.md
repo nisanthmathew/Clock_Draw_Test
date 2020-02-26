@@ -6,7 +6,7 @@ it also provides a histogram of the image drawn.
 
 
 
-
+![alt text](clock_draw_results.jpg)
 
 
 
