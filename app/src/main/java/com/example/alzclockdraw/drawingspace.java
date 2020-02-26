@@ -201,7 +201,7 @@ public class drawingspace extends AppCompatActivity {
 
     int[] Xaxis_histogram(Bitmap inputimage, int firstpixel_position, int lastpixel_position){
         /*accesing pixel for histogram with x aixs as reference**/
-        int[] histogram_xaxis = new int[lastpixel_position-firstpixel_position];
+        int[] histogram_xaxis = new int[(lastpixel_position-firstpixel_position)];
         int xaxis_sampling_factor = 3;
         int xaxis_sample_number = 0;
         for(int imagecolumn= firstpixel_position; imagecolumn<lastpixel_position; imagecolumn=imagecolumn+xaxis_sampling_factor){
@@ -305,7 +305,7 @@ public class drawingspace extends AppCompatActivity {
         textpaint.setColor(Color.BLUE);
         textpaint.setTextSize(35);
 
-        if(abs(horizontallength-verticallength) > 50){ //checking whether the difference between horizontal diameter and vertical diameter is less than 50 pixel counts.
+        if(abs(horizontallength-verticallength) > horizontallength*0.1 || abs(horizontallength-verticallength) > verticallength*0.1){ //checking whether the difference between horizontal diameter and vertical diameter is greater than 10%.
 
             inputimage.drawText("Clock shape not uniform",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.85f, textpaint);
 
@@ -315,80 +315,155 @@ public class drawingspace extends AppCompatActivity {
         }
     }
 
-    void clocknumberverticaldistributionchecker(Canvas inputimage, int[] histogram){
+    void clocknumberverticaldistributionchecker(Canvas inputimage, int[] histogram){ //x axis image analysis
         Paint textpaint = new Paint();
         textpaint.setColor(Color.BLUE);
         textpaint.setTextSize(35);
+        int[] tempstorageenvlp = new int[7];
+        int iterator = 0;
+        /****************************envelope extraction*******************************************/
+        while(iterator + 7 < histogram.length) {
+            for (int j = 0; j < 7; j++) // taking a window of 7 pixel which is the width of one stroke
+            {
+                tempstorageenvlp[j] = histogram[j + iterator]; // storing data in a temp array
+            }
+
+            int maxvalue = tempstorageenvlp[0];
+            for (int i = 1; i < tempstorageenvlp.length; i++) {
+                if (tempstorageenvlp[i] > maxvalue) {
+                    maxvalue = tempstorageenvlp[i];
+                }
+            }
+
+            for (int j = 0; j < 7; j++) {
+                histogram[j+iterator] = maxvalue; //replacing all values using max value
+            }
+            iterator += 7;
+        }
+        /**************************finding the average of histogram********************************/
         int averageXaxis = 0;
         for(int i=0; i<histogram.length; i++){
             averageXaxis += histogram[i];
+
         }
-        averageXaxis = (averageXaxis/histogram.length)+7;//7(adding the pixel count for 1 stroke with the average)
-        // dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window.
+        averageXaxis = (averageXaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling
+
+
+        /*******dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window****/
+
         int peakcounter = 0;
         int runningcounter = 0; //temporary buffer
         int segmentcounter = 1;
-        int segmentsize = (histogram.length)/7;
+        int segmentsize = (histogram.length/3)/7;
+        Log.d("segment size", String.valueOf(segmentsize));
+
         int segmentstartposition = 0;
 
-        while(segmentcounter<=7) { //iterating through each segements
+        while(segmentcounter <= 7) { //iterating through each segements
             for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
                 if (histogram[i] > averageXaxis) {
                     runningcounter++;
+                    Log.d("segment location", String.valueOf(i));
+
                 }
-                if (runningcounter > 10) { //checking for atleast 15 closly lying values greater than average value + 7(adding the pixel count for 1 stroke)
+                else{
+                    runningcounter = 0;
+                }
+                if (runningcounter >= 3) { //checking for atleast 3 closly lying values greater than average value
                     peakcounter++;
                     runningcounter = 0;
-                    segmentstartposition += segmentsize;
+                    Log.d("segment position", String.valueOf(segmentstartposition));
+                    i =  segmentcounter*segmentsize;
+
+
                 }
             }
+            segmentstartposition += segmentsize;
             segmentcounter++;
         }
 
         if(peakcounter <= 11 && peakcounter >=7){ //checking wether the peaks detected falls in the tolerence window
-            inputimage.drawText("Numbering in x axis is symmetric. Peaks detected: " + String.valueOf(peakcounter),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
+            inputimage.drawText("Numbering in x axis is symmetric.",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
         }
         else{
-            inputimage.drawText("Numbering in x axis is asymmetric. Peaks detected: " + String.valueOf(peakcounter),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
+            inputimage.drawText("Numbering in x axis is asymmetric.",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.90f, textpaint);
         }
     }
 
 
-    void clocknumberhorizontaldistributionchecker(Canvas inputimage, int[] histogram){
+    void clocknumberhorizontaldistributionchecker(Canvas inputimage, int[] histogram){ //y axis image analysis
+
         Paint textpaint = new Paint();
         textpaint.setColor(Color.BLUE);
         textpaint.setTextSize(35);
+        int[] tempstorageenvlp = new int[7];
+        int iterator = 0;
+
+        /****************************envelope extraction*******************************************/
+        while(iterator + 7 < histogram.length) {
+            for (int j = 0; j < 7; j++) // taking a window of 7 pixel which is the width of one stroke
+            {
+                tempstorageenvlp[j] = histogram[j + iterator]; // storing data in a temp array
+            }
+
+            int maxvalue = tempstorageenvlp[0];
+            for (int i = 1; i < tempstorageenvlp.length; i++) {
+                if (tempstorageenvlp[i] > maxvalue) {
+                    maxvalue = tempstorageenvlp[i];
+                }
+            }
+
+            for (int j = 0; j < 7; j++) {
+                histogram[j+iterator] = maxvalue; //replacing all values using max value
+            }
+            iterator += 7;
+        }
+
+        /**************************finding the average of histogram********************************/
         int averageYaxis = 0;
         for(int i=0; i<histogram.length; i++){
             averageYaxis += histogram[i];
+
         }
-        averageYaxis = (averageYaxis/histogram.length)+ 7; //7(adding the pixel count for 1 stroke with the average)
-        // dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window.
+        averageYaxis = (averageYaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling
+
+        /*******dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window****/
+
         int peakcounter = 0;
-        int runningcounter = 0;
+        int runningcounter = 0; //temporary buffer
         int segmentcounter = 1;
-        int segmentsize = (histogram.length)/7;
+        int segmentsize = (histogram.length/3)/7;
+        Log.d("segment size", String.valueOf(segmentsize));
+
         int segmentstartposition = 0;
 
-        while(segmentcounter<=7) {
+        while(segmentcounter <= 7) { //iterating through each segements
             for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
                 if (histogram[i] > averageYaxis) {
                     runningcounter++;
+
                 }
-                if (runningcounter > 10) { //checking for atleast 15 closly lying values greater than average value + 7(adding the pixel count for 1 stroke)
+                else{
+                    runningcounter = 0;
+                }
+                if (runningcounter >= 3) { //checking for atleast 3 closly lying values greater than average value
                     peakcounter++;
                     runningcounter = 0;
-                    segmentstartposition += segmentsize;
+                    i =  segmentcounter*segmentsize;
+
+
                 }
             }
+            segmentstartposition += segmentsize;
             segmentcounter++;
         }
 
+
         if(peakcounter <= 11 && peakcounter >=7){ //checking whether the peaks detected falls in the tolerence window
-            inputimage.drawText("Numbering in y axis is symmetric. Peaks detected:  " + String.valueOf(peakcounter),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
+            inputimage.drawText("Numbering in y axis is symmetric",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
         }
         else{
-            inputimage.drawText("Numbering in y axis is asymmetric. Peaks detected:  " + String.valueOf(peakcounter),inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
+            inputimage.drawText("Numbering in y axis is asymmetric.",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
         }
     }
 
