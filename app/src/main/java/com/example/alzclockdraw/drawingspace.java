@@ -5,6 +5,7 @@ package com.example.alzclockdraw;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -113,8 +114,8 @@ public class drawingspace extends AppCompatActivity {
 
                                        //image analysis functions
                                        clockshapeuniformity(saveimage, xaxis_limits, yaxis_limits);
-                                       clocknumberverticaldistributionchecker(saveimage, xaxishistogram);
-                                       clocknumberhorizontaldistributionchecker(saveimage, yaxishistogram);
+                                       clocknumberverticaldistributionchecker(saveimage, xaxishistogram, xaxis_limits[0], yaxis_limits);
+                                       clocknumberhorizontaldistributionchecker(saveimage, yaxishistogram, yaxis_limits[0], xaxis_limits);
 
                                        for(int imagecolumn = 0; imagecolumn < width*0.2; imagecolumn++){ //removing the floating buttons
                                            for(int imagerow= 0; imagerow < (height*0.2) ; imagerow++){
@@ -155,7 +156,7 @@ public class drawingspace extends AppCompatActivity {
 
 
 
-    int[] first_and_last_clockpixel_finder_xaxis( Bitmap inputimage ){
+    int[] first_and_last_clockpixel_finder_xaxis( Bitmap inputimage ){ //finsding start and end positions of clock on x axis
         int[] xaxis_pixels = new int[2];
         int height = inputimage.getHeight();
         int width = inputimage.getWidth();
@@ -177,7 +178,7 @@ public class drawingspace extends AppCompatActivity {
         return xaxis_pixels;
     }
 
-    int[] first_and_last_clockpixel_finder_yaxis( Bitmap inputimage ){
+    int[] first_and_last_clockpixel_finder_yaxis( Bitmap inputimage ){ //finsding start and end positions of clock on y axis
         int[] yaxis_pixels = new int[2];
         int height = inputimage.getHeight();
         int width = inputimage.getWidth();
@@ -199,7 +200,7 @@ public class drawingspace extends AppCompatActivity {
         return yaxis_pixels;
     }
 
-    int[] Xaxis_histogram(Bitmap inputimage, int firstpixel_position, int lastpixel_position){
+    int[] Xaxis_histogram(Bitmap inputimage, int firstpixel_position, int lastpixel_position){ //finding the histogramm of the image along x axis
         /*accesing pixel for histogram with x aixs as reference**/
         int[] histogram_xaxis = new int[(lastpixel_position-firstpixel_position)];
         int xaxis_sampling_factor = 3;
@@ -228,7 +229,7 @@ public class drawingspace extends AppCompatActivity {
         return histogram_xaxis;
     }
 
-    int[] Yaxis_histogram(Bitmap inputimage, int firstpixel_position, int lastpixel_position){
+    int[] Yaxis_histogram(Bitmap inputimage, int firstpixel_position, int lastpixel_position){ //finding the histogramm of the image along y axis
         int[] histogram_yaxis = new int[lastpixel_position-firstpixel_position];
         int yaxis_sampling_factor = 3;
         int yaxis_sample_number = 0;
@@ -315,10 +316,21 @@ public class drawingspace extends AppCompatActivity {
         }
     }
 
-    void clocknumberverticaldistributionchecker(Canvas inputimage, int[] histogram){ //x axis image analysis
-        Paint textpaint = new Paint();
+    void clocknumberverticaldistributionchecker(Canvas inputimage, int[] histogram, int xaxis_starting_pixel, int [] yaxis_limits){ //x axis image analysis
+        Paint textpaint = new Paint(); //paint for text
         textpaint.setColor(Color.BLUE);
         textpaint.setTextSize(35);
+
+        Paint peakpaint = new Paint(); //paint to draw peak lines
+        peakpaint.setColor(Color.RED);
+        peakpaint.setStrokeWidth(2);
+
+        Paint segmentpaint = new Paint(); //paint to draw segment start lines
+        segmentpaint.setColor(Color.DKGRAY);
+        segmentpaint.setStrokeWidth(1);
+        segmentpaint.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
+
+
         int[] tempstorageenvlp = new int[7];
         int iterator = 0;
         /****************************envelope extraction*******************************************/
@@ -336,7 +348,7 @@ public class drawingspace extends AppCompatActivity {
             }
 
             for (int j = 0; j < 7; j++) {
-                histogram[j+iterator] = maxvalue; //replacing all values using max value
+                histogram[j+iterator] = maxvalue; //replacing all values using max value - inorder to remove random spikes and smooth out the envelop
             }
             iterator += 7;
         }
@@ -346,7 +358,7 @@ public class drawingspace extends AppCompatActivity {
             averageXaxis += histogram[i];
 
         }
-        averageXaxis = (averageXaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling
+        averageXaxis = (averageXaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling and remaining elements in the array are zeros.
 
 
         /*******dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window****/
@@ -360,6 +372,10 @@ public class drawingspace extends AppCompatActivity {
         int segmentstartposition = 0;
 
         while(segmentcounter <= 7) { //iterating through each segements
+
+            inputimage.drawLine((float) (segmentstartposition*3)+xaxis_starting_pixel, yaxis_limits[0], //indicating segment start positions using lines
+                    (float) (segmentstartposition*3)+xaxis_starting_pixel, yaxis_limits[1],
+                    segmentpaint);
             for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
                 if (histogram[i] > averageXaxis) {
                     runningcounter++;
@@ -370,6 +386,7 @@ public class drawingspace extends AppCompatActivity {
                     runningcounter = 0;
                 }
                 if (runningcounter >= 3) { //checking for atleast 3 closly lying values greater than average value
+                    //inputimage.drawLine((float) (i*3)+xaxis_starting_pixel, yaxis_limits[0], (float) (i*3)+xaxis_starting_pixel, yaxis_limits[1], peakpaint);
                     peakcounter++;
                     runningcounter = 0;
                     Log.d("segment position", String.valueOf(segmentstartposition));
@@ -378,7 +395,7 @@ public class drawingspace extends AppCompatActivity {
 
                 }
             }
-            segmentstartposition += segmentsize;
+            segmentstartposition += segmentsize; // incrementing the loop start position to the start position of next segment after finding a peak
             segmentcounter++;
         }
 
@@ -391,14 +408,24 @@ public class drawingspace extends AppCompatActivity {
     }
 
 
-    void clocknumberhorizontaldistributionchecker(Canvas inputimage, int[] histogram){ //y axis image analysis
+    void clocknumberhorizontaldistributionchecker(Canvas inputimage, int[] histogram, int yaxis_starting_pixel, int[] xaxis_limits){ //y axis image analysis
 
-        Paint textpaint = new Paint();
+        Paint textpaint = new Paint(); //paint for text
         textpaint.setColor(Color.BLUE);
         textpaint.setTextSize(35);
+
+        Paint peakpaint = new Paint(); //paint to draw peak lines
+        peakpaint.setColor(Color.RED);
+        peakpaint.setStrokeWidth(2);
+
+        Paint segmentpaint = new Paint(); //paint to draw segment start lines
+        segmentpaint.setColor(Color.DKGRAY);
+        segmentpaint.setStrokeWidth(1);
+        segmentpaint.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
+
+
         int[] tempstorageenvlp = new int[7];
         int iterator = 0;
-
         /****************************envelope extraction*******************************************/
         while(iterator + 7 < histogram.length) {
             for (int j = 0; j < 7; j++) // taking a window of 7 pixel which is the width of one stroke
@@ -414,18 +441,18 @@ public class drawingspace extends AppCompatActivity {
             }
 
             for (int j = 0; j < 7; j++) {
-                histogram[j+iterator] = maxvalue; //replacing all values using max value
+                histogram[j+iterator] = maxvalue; //replacing all values using max value - inorder to remove random spikes and smooth out the envelop
             }
             iterator += 7;
         }
-
         /**************************finding the average of histogram********************************/
         int averageYaxis = 0;
         for(int i=0; i<histogram.length; i++){
             averageYaxis += histogram[i];
 
         }
-        averageYaxis = (averageYaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling
+        averageYaxis = (averageYaxis/(histogram.length/3));//dividing by histogram/3 since the data only has 1/3 of the data due to sampling and remaining elements in the array are zeros.
+
 
         /*******dividing the clock vertically into 7 segments and look for peaks corrresponding to numbers in each window****/
 
@@ -438,29 +465,35 @@ public class drawingspace extends AppCompatActivity {
         int segmentstartposition = 0;
 
         while(segmentcounter <= 7) { //iterating through each segements
+
+            inputimage.drawLine((float)  xaxis_limits[0], (segmentstartposition*3)+yaxis_starting_pixel, //indicating segment start positions using lines
+                    xaxis_limits[1],(float) (segmentstartposition*3)+yaxis_starting_pixel,
+                    segmentpaint);
             for (int i = segmentstartposition; i < segmentsize*segmentcounter; i++) {
                 if (histogram[i] > averageYaxis) {
                     runningcounter++;
+                    Log.d("segment location", String.valueOf(i));
 
                 }
                 else{
                     runningcounter = 0;
                 }
                 if (runningcounter >= 3) { //checking for atleast 3 closly lying values greater than average value
+                   // inputimage.drawLine(xaxis_limits[0], (float) (i*3)+yaxis_starting_pixel, xaxis_limits[1],(float) (i*3)+yaxis_starting_pixel,  peakpaint);
                     peakcounter++;
                     runningcounter = 0;
+                    Log.d("segment position", String.valueOf(segmentstartposition));
                     i =  segmentcounter*segmentsize;
 
 
                 }
             }
-            segmentstartposition += segmentsize;
+            segmentstartposition += segmentsize; // incrementing the loop start position to the start position of next segment after finding a peak
             segmentcounter++;
         }
 
-
         if(peakcounter <= 11 && peakcounter >=7){ //checking whether the peaks detected falls in the tolerence window
-            inputimage.drawText("Numbering in y axis is symmetric",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
+            inputimage.drawText("Numbering in y axis is symmetric.",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
         }
         else{
             inputimage.drawText("Numbering in y axis is asymmetric.",inputimage.getWidth()*0.05f, inputimage.getHeight()*0.95f, textpaint);
