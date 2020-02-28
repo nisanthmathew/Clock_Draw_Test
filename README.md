@@ -6,9 +6,9 @@ it also provides a histogram of the image drawn.
 
 
 
-![alt text](clock_draw_results.jpg)
+![alt text](clock_image_1.jpg)
 
-![alt text](clock_draw_results1.jpg)
+![alt text](clock_image_2.jpg)
 
 
 
